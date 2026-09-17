@@ -1,0 +1,15 @@
+# Build output
+/bin/
+
+# Editor / OS noise
+.DS_Store
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Local-only test artefacts
+/tmp/
+*.log
+flow.config.json.lock
+*.agent-operations/

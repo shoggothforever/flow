@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>记录一条｜每日轨迹</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/capture.css">
+</head>
+<body>
+  <main class="capture-wrap">
+    <nav class="app-nav">
+      <a class="brand" href="index.html">每日轨迹</a>
+      <div class="nav-links"><a class="active" href="capture.html">记录</a><a href="inbox.html">收件箱</a><a href="index.html">年度轨迹</a></div>
+    </nav>
+    <div class="eyebrow">Quick capture</div>
+    <h1>记录一条</h1>
+    <p class="lead">不用整理成日报。可以记录今天，也可以补记过去某天的工作或学习。</p>
+    <form id="capture-form">
+      <fieldset>
+        <legend>归类</legend>
+        <div class="segmented">
+          <label><input type="radio" name="category" value="work" checked><span>工作</span></label>
+          <label><input type="radio" name="category" value="learning"><span>个人学习</span></label>
+          <label><input type="radio" name="category" value="uncertain"><span>暂不确定</span></label>
+        </div>
+      </fieldset>
+      <label class="field"><span>记录日期 <b>*</b></span><input name="localDate" type="date" required><small>可选今天或过去日期，不能选未来日期。</small></label>
+      <label class="field"><span>事项 <b>*</b></span><input name="title" maxlength="200" required autofocus placeholder="例如：完成登录模块接口联调"></label>
+      <div class="two">
+        <label class="field"><span>状态</span><select name="status"><option value="in_progress">进行中</option><option value="completed">已完成</option><option value="planned">计划</option></select></label>
+        <label class="field"><span>时间（可选）</span><input name="time" maxlength="20" placeholder="例如：14:30"></label>
+      </div>
+      <label class="field"><span>补充说明</span><textarea name="details" maxlength="5000" rows="5" placeholder="结果、背景、阻塞或学到的关键点"></textarea></label>
+      <div class="two">
+        <label class="field"><span>相关链接</span><input name="url" type="url" maxlength="2000" placeholder="https://..."></label>
+        <label class="field"><span>链接名称</span><input name="linkLabel" maxlength="120" placeholder="例如：需求文档"></label>
+      </div>
+      <label class="field research-depth"><span>总结时处理链接</span><select name="researchDepth"><option value="none">不处理</option><option value="quick">快速探索：日报核心观点</option><option value="standard">标准解读：核心观点＋独立报告</option><option value="deep">深度精读：核心观点＋完整研究报告</option></select><small>标准与深度报告会保存到本地研究目录，并在日报中提供阅读链接。</small></label>
+      <button type="submit">保存到所选日期收件箱</button>
+      <p id="status" role="status" aria-live="polite"></p>
+    </form>
+    <section class="capture-note"><strong>保存位置</strong><p>内容会立即写入本机所选日期的 <code>records/inbox/YYYY-MM-DD.jsonl</code>，不会上传公网。</p></section>
+  </main>
+  <script src="assets/capture.js"></script>
+</body>
+</html>

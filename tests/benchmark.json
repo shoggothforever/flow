@@ -1,0 +1,116 @@
+{
+  "test_cases": [
+    {
+      "id": "tc-20260714-001",
+      "created": "2026-07-14",
+      "task": "Track the personal Flow config in the source repository",
+      "input": {
+        "description": "Track the personal alias configuration in the Flow source repository and provide an integrated export/import workflow.",
+        "context": "The active config is a single JSON file with no current secrets; runtime scheduler state must remain local."
+      },
+      "expected_output": {
+        "files": [
+          "cmd/config_cmd.go",
+          "cmd/config_snapshot.go",
+          "internal/config/snapshot.go",
+          "internal/config/snapshot_test.go",
+          "flow.config.json",
+          "README.md"
+        ],
+        "criteria": [
+          "Flow exposes config export and import commands",
+          "The repository tracks the current personal config as flow.config.json",
+          "Export validates and atomically updates the snapshot",
+          "Import validates and migrates before atomically replacing the active config",
+          "Runtime history, locks, temporary files, and scheduler logs are excluded",
+          "All Go tests, race checks for config, and go vet pass"
+        ],
+        "key_behaviors": [
+          "Running flow config export from the source root updates flow.config.json",
+          "Invalid snapshots never overwrite the active config",
+          "Git commit and push remain part of the normal source repository workflow"
+        ]
+      },
+      "evaluation": {
+        "method": "test_execution",
+        "pass_threshold": "all_criteria"
+      }
+    },
+    {
+      "id": "tc-20260714-002",
+      "created": "2026-07-14",
+      "task": "Optimize the Flow web UI and concurrent run output",
+      "input": {
+        "description": "Optimize the current Flow UI implementation without breaking CRUD, scheduling, or streamed run output.",
+        "context": "The existing page is a dependency-free embedded HTML/CSS/JavaScript application with a new multi-tab output panel."
+      },
+      "expected_output": {
+        "files": [
+          "internal/ui/static/index.html",
+          "internal/ui/static_index_test.go"
+        ],
+        "criteria": [
+          "Only the selected resource section is visible",
+          "Concurrent runs retain independent Stop button and output-tab state",
+          "Unexpected stream closure cannot leave a run permanently marked running",
+          "Dynamic aliases are safely passed through data attributes instead of inline JavaScript",
+          "The layout is responsive and keyboard focus is visible",
+          "Modal and output tabs expose appropriate accessibility semantics",
+          "Go tests, UI race tests, JavaScript syntax validation, and local UI/API smoke tests pass"
+        ],
+        "key_behaviors": [
+          "Escape closes an open modal before stopping the active run",
+          "Arrow keys switch between output tabs",
+          "Finished output tabs can be cleared without interrupting running tabs",
+          "Reload, save, delete, and API failures use non-blocking status feedback"
+        ]
+      },
+      "evaluation": {
+        "method": "test_execution",
+        "pass_threshold": "all_criteria"
+      }
+    },
+    {
+      "id": "tc-20260714-003",
+      "created": "2026-07-14",
+      "task": "Remove unused tmux functionality from Flow",
+      "input": {
+        "description": "Remove Flow's tmux and layout functionality because the remote shell already provides splitting and there is no current use case.",
+        "context": "The removal must cover the CLI, configuration schema, lazy dispatch, picker and chain workflows, Web UI/API, tests, and documentation while preserving all non-layout personal configuration."
+      },
+      "expected_output": {
+        "files": [
+          "cmd/root.go",
+          "cmd/script.go",
+          "cmd/dispatch.go",
+          "cmd/run.go",
+          "internal/config/schema.go",
+          "internal/config/migrate.go",
+          "internal/config/migrate_test.go",
+          "internal/ui/server.go",
+          "internal/ui/static/index.html",
+          "flow.config.json",
+          "README.md",
+          "CLAUDE.md"
+        ],
+        "criteria": [
+          "The layout and up commands are no longer registered",
+          "Script execution no longer exposes in-tmux or session flags",
+          "The layout schema, tmux driver, UI tab, and layouts API are removed",
+          "Schema v1 migrates to v2 by dropping legacy layouts while preserving supported resources",
+          "The active config and tracked snapshot validate at schema v2 without a layouts field",
+          "All Go tests, focused race checks, go vet, build, and JavaScript syntax validation pass"
+        ],
+        "key_behaviors": [
+          "flow layout and flow up return unknown-command errors",
+          "Lazy dispatch and interactive workflows cover scripts, cmds, greps, finds, and jumps only",
+          "Projects, scripts, cmds, greps, finds, and schedules survive migration unchanged"
+        ]
+      },
+      "evaluation": {
+        "method": "test_execution",
+        "pass_threshold": "all_criteria"
+      }
+    }
+  ]
+}
