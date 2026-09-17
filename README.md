@@ -101,32 +101,29 @@ so when you move a checkout you only update one place (`flow project rm`/`add`).
 | `flow run`                             | unified picker: pick a script / cmd / grep / find / jump            |
 | `flow config path/edit/validate`       | inspect / edit / validate the config                                |
 | `flow config migrate`                  | upgrade an older config to the current schema version               |
-| `flow config export/import`            | save or restore a versionable config snapshot                       |
+| `flow config export/import`            | save or restore a private JSON config snapshot                      |
 
 All commands honour `-v` for verbose logging on stderr.
 
-### Version the config in this repository
+### Back up your config privately
 
-Export the active personal config into the Flow source tree, then commit it with
-the rest of the repository:
+The active config can contain local paths, commands, schedules, and TAPD/session
+metadata. Keep exports outside this Git repository. `flow.config.json` is ignored
+if you export from the source directory by accident.
 
 ```bash
-cd /path/to/flow
-flow config export                 # writes ./flow.config.json
-git add flow.config.json
-git commit -m "update personal flow config"
+mkdir -p "$HOME/flow-backups"
+flow config export "$HOME/flow-backups/flow.config.json"
 ```
 
 `export` validates the active config and atomically updates only the JSON
 snapshot. Scheduler history, locks, temporary files, and logs are not included.
 
-On another machine, clone the source repository and import the tracked snapshot:
+On another machine, copy the private snapshot and import it explicitly:
 
 ```bash
-cd /path/to/flow
-flow config import
+flow config import /path/to/private/flow.config.json
 flow config validate
-flow scheduler install
 ```
 
 `import` validates and migrates the snapshot before atomically replacing the

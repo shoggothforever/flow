@@ -33,6 +33,7 @@ flow ui                         # defaults to 127.0.0.1:7777
 ```
 
 Config snapshots include TAPD requirements and tracked session metadata. Scheduler history, locks and fork operation records are runtime state and are not exported.
+Keep personal config snapshots outside the Git repository. `flow.config.json` is ignored and must not be committed.
 
 ## Common resource operations
 

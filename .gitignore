@@ -11,5 +11,6 @@
 # Local-only test artefacts
 /tmp/
 *.log
+flow.config.json
 flow.config.json.lock
 *.agent-operations/
