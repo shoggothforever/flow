@@ -32,8 +32,8 @@ func TestSaveLoadRoundTripAtomic(t *testing.T) {
 	c := &Config{
 		SchemaVersion: CurrentSchemaVersion,
 		Projects: []Project{
-			{Alias: "oev", Path: "/dsm/oev"},
-			{Alias: "cube", Path: "/dsm/oev/CubeSandbox", Tags: []string{"go", "rust"}},
+			{Alias: "work", Path: "/home/user/work"},
+			{Alias: "cube", Path: "/home/user/work/CubeSandbox", Tags: []string{"go", "rust"}},
 		},
 	}
 	if err := s.Save(c); err != nil {

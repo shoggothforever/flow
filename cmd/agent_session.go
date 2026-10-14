@@ -12,7 +12,7 @@ import (
 
 func init() {
 	var asJSON bool
-	root := &cobra.Command{Use: "agent-session", Short: "Associate TAPD requirements with Codex sessions and fork trees"}
+	root := &cobra.Command{Use: "agent-session", Short: "Associate requirements with Codex sessions and fork trees"}
 	root.PersistentFlags().BoolVar(&asJSON, "json", false, "print structured JSON")
 	rootCmd.AddCommand(root)
 	service := func() (*agentsession.Service, error) {
@@ -35,18 +35,21 @@ func init() {
 			return nil
 		}
 	}
-	tapd := &cobra.Command{Use: "tapd", Short: "Manage TAPD requirement links"}
+	tapd := &cobra.Command{Use: "tapd", Short: "Manage requirements and their optional URLs"}
 	root.AddCommand(tapd)
 	for _, verb := range []string{"add", "edit"} {
 		verb := verb
 		var title, notes, rawURL string
-		use := verb + " <url>"
+		use := verb + " <title>"
 		if verb == "edit" {
 			use = verb + " <requirement-id>"
 		}
 		c := &cobra.Command{Use: use, Args: cobra.ExactArgs(1), RunE: wrap(func(c *cobra.Command, args []string, s *agentsession.Service) error {
 			id := ""
-			u := args[0]
+			u := rawURL
+			if verb == "add" {
+				title = args[0]
+			}
 			if verb == "edit" {
 				id = args[0]
 				cfg, e := s.Store.Load()
@@ -78,10 +81,10 @@ func init() {
 			fmt.Printf("%s  %s  %s\n", v.ID, v.Title, v.URL)
 			return nil
 		})}
-		c.Flags().StringVar(&title, "title", "", "display title")
 		c.Flags().StringVar(&notes, "notes", "", "requirement notes")
+		c.Flags().StringVar(&rawURL, "url", "", "optional related URL")
 		if verb == "edit" {
-			c.Flags().StringVar(&rawURL, "url", "", "updated TAPD URL")
+			c.Flags().StringVar(&title, "title", "", "updated requirement title")
 		}
 		tapd.AddCommand(c)
 	}

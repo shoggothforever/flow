@@ -45,6 +45,32 @@ func TestMigrateV1ToV2DropsLegacyLayoutsOnSave(t *testing.T) {
 	}
 }
 
+func TestMigrateV2RequiresNamesAndMakesURLsOptional(t *testing.T) {
+	c := &Config{
+		SchemaVersion: 2,
+		TAPDRequirements: []TAPDRequirement{
+			{ID: "00000000-0000-4000-8000-000000000001", URL: "https://tapd.example/story/123?tab=detail"},
+			{ID: "00000000-0000-4000-8000-000000000002", Title: "已有名称", URL: ""},
+		},
+	}
+	changed, err := Migrate(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !changed || c.SchemaVersion != 3 {
+		t.Fatalf("migration result: changed=%v schema_version=%d", changed, c.SchemaVersion)
+	}
+	if c.TAPDRequirements[0].Title != "tapd.example/story/123" {
+		t.Fatalf("legacy requirement did not receive a useful title: %+v", c.TAPDRequirements[0])
+	}
+	if c.TAPDRequirements[1].Title != "已有名称" || c.TAPDRequirements[1].URL != "" {
+		t.Fatalf("existing title or optional URL changed: %+v", c.TAPDRequirements[1])
+	}
+	if err := c.Validate(); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestMigrateCurrentVersionIsNoop(t *testing.T) {
 	c := &Config{SchemaVersion: CurrentSchemaVersion}
 	changed, err := Migrate(c)

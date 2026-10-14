@@ -103,7 +103,9 @@ func TestAgentSessionHTTPWorkflow(t *testing.T) {
 	call("GET", "/api/agent-sessions/operations", "", 200)
 	call("DELETE", "/api/tapd-requirements/"+id, "", 200)
 	call("POST", "/api/agent-sessions/"+apiParent+"/fork", `{"request_id":"../bad"}`, 400)
-	call("POST", "/api/tapd-requirements", `{"url":"javascript:alert(1)"}`, 400)
+	call("POST", "/api/tapd-requirements", `{"title":"仅名称需求"}`, 200)
+	call("POST", "/api/tapd-requirements", `{"url":"https://example.com/task/2"}`, 400)
+	call("POST", "/api/tapd-requirements", `{"title":"无效 URL","url":"javascript:alert(1)"}`, 400)
 	call("POST", "/api/tapd-requirements", `{"url":"https://tapd.example","session_ids":[]}`, 400)
 	call("GET", "/api/agent-sessions/"+apiParent+"/fork", "", 405)
 	for _, asset := range []string{"/assets/theme.css", "/assets/agent-sessions.css", "/assets/agent-sessions.js"} {

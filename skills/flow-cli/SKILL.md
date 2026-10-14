@@ -1,13 +1,13 @@
 ---
 name: flow-cli
-description: Use when using or developing the local Flow CLI and web UI in /dsm/oev/flow, including resource configuration, lazy aliases, command chains, schedules, config snapshots, and TAPD-to-Codex session association and fork trees. Covers Flow integration with Codex; not general Codex setup or unrelated TAPD automation.
+description: Use when using or developing the Flow CLI and web UI from its repository root, including resource configuration, lazy aliases, command chains, schedules, config snapshots, and TAPD-to-Codex session association and fork trees. Covers Flow integration with Codex; not general Codex setup or unrelated TAPD automation.
 ---
 
 # flow-cli
 
 ## Project and working state
 
-`flow` lives in `/dsm/oev/flow`. It uses Go/Cobra, an embedded HTML/CSS/JavaScript UI, and a shared JSON configuration. It manages projects, scripts, parametrised commands, grep/find presets, schedules, and TAPD/Codex session associations.
+`flow` lives in the repository root. It uses Go/Cobra, an embedded HTML/CSS/JavaScript UI, and a shared JSON configuration. It manages projects, scripts, parametrised commands, grep/find presets, schedules, and TAPD/Codex session associations.
 
 - Read `git status --short` and relevant diffs before editing. Preserve existing working-copy changes, including removals and untracked reference files. Do not delete `.codebuddy/`.
 - Verify the executable with `command -v flow` and `flow --version`. The usual installation is `~/.local/bin/flow`; a fresh source build is `./bin/flow` and may differ from the installed version.
@@ -95,7 +95,7 @@ The UI is embedded through `internal/ui/server.go`; there is no frontend build o
 The feature is available through `flow agent-session` and UI **需求与会话** at `/#agent-sessions`. Shared behavior belongs in `internal/agentsession`; `cmd/agent_session.go` and the HTTP handlers call that service.
 
 ```bash
-flow agent-session tapd add 'https://tapd.example/story/123' --title 'Replay updates'
+flow agent-session tapd add 'Replay updates' --url 'https://example.com/task/123'
 flow agent-session tapd list --json
 flow agent-session tapd edit <requirement-id> --notes 'Updated scope'
 flow agent-session list --local --json
@@ -113,7 +113,7 @@ flow agent-session tapd rm <requirement-id>
 - Persist the full Codex `thread.id`: this is the ID for `codex resume`. Codex `sessionId` identifies the shared session-tree root and must not replace a fork's thread ID.
 - `forkedFromId` supplies ordinary fork ancestry. `parentThreadId` describes an internal subagent relationship; exclude internal subagents from the user-facing session inventory/tree.
 - UI labels normally show eight ID characters and extend on collision. Stored IDs and copied commands stay complete. `link` and `fork` resolve short inputs against a complete local listing; ambiguous prefixes fail. Full IDs can be associated even if unavailable locally.
-- `tapd_requirements` stores a stable requirement ID, URL, title, notes, explicit session entrypoints and excluded branches. Preserve URL query parameters; do not invent TAPD-specific parsing or authentication.
+- `tapd_requirements` stores a stable requirement ID, required title, optional URL and notes, explicit session entrypoints and excluded branches. Preserve URL query parameters; do not invent provider-specific parsing or authentication.
 - `agent_sessions` stores canonical session metadata and parent links once. The same session can appear under several requirements. Local display labels are shared and do not rename the conversation in Codex.
 - Effective membership expands ordinary fork descendants from each requirement's entrypoints. Importing a child adds readable ancestors as context nodes, not implicit requirement membership.
 - Unlink removes the branch from only that requirement and records an exclusion; refresh must not restore it. Explicitly linking that node again clears its exclusion. Deleting a requirement does not delete Codex sessions.
@@ -141,7 +141,7 @@ HTTP entrypoints are `/api/tapd-requirements` and `/api/agent-sessions`. Reads u
 ## Build, verification and delivery
 
 ```bash
-cd /dsm/oev/flow
+cd /path/to/flow
 go test ./...
 go vet ./...
 make build

@@ -9,7 +9,7 @@ import (
 )
 
 // CurrentSchemaVersion is bumped whenever a non-additive change to the schema lands.
-const CurrentSchemaVersion = 2
+const CurrentSchemaVersion = 3
 
 // Config is the single root document persisted to JSON.
 type Config struct {

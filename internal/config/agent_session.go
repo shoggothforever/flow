@@ -14,8 +14,8 @@ func ValidSessionID(id string) bool { return uuidPattern.MatchString(id) }
 
 type TAPDRequirement struct {
 	ID                string   `json:"id"`
-	URL               string   `json:"url"`
-	Title             string   `json:"title,omitempty"`
+	URL               string   `json:"url,omitempty"`
+	Title             string   `json:"title"`
 	Notes             string   `json:"notes,omitempty"`
 	SessionIDs        []string `json:"session_ids,omitempty"`
 	ExcludedBranchIDs []string `json:"excluded_branch_ids,omitempty"`
@@ -35,10 +35,14 @@ type AgentSession struct {
 	Archived     bool   `json:"archived,omitempty"`
 }
 
-func NormalizeTAPDURL(raw string) (string, error) {
-	u, err := url.Parse(strings.TrimSpace(raw))
+func NormalizeRequirementURL(raw string) (string, error) {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return "", nil
+	}
+	u, err := url.Parse(raw)
 	if err != nil || u == nil || (u.Scheme != "http" && u.Scheme != "https") || u.Hostname() == "" || u.User != nil {
-		return "", fmt.Errorf("TAPD URL must be an http(s) link without credentials")
+		return "", fmt.Errorf("URL must be an http(s) link without credentials")
 	}
 	u.Scheme = strings.ToLower(u.Scheme)
 	u.Host = strings.ToLower(u.Host)
@@ -82,14 +86,19 @@ func (c *Config) validateAgentSessions() error {
 			return fmt.Errorf("invalid or duplicate requirement ID %q", r.ID)
 		}
 		ids[r.ID] = true
-		u, err := NormalizeTAPDURL(r.URL)
+		if strings.TrimSpace(r.Title) == "" && c.SchemaVersion >= 3 {
+			return fmt.Errorf("requirement title is required")
+		}
+		u, err := NormalizeRequirementURL(r.URL)
 		if err != nil {
 			return err
 		}
-		if urls[u] {
-			return fmt.Errorf("TAPD link is already registered: %s", u)
+		if u != "" && urls[u] {
+			return fmt.Errorf("URL is already registered: %s", u)
 		}
-		urls[u] = true
+		if u != "" {
+			urls[u] = true
+		}
 		for _, list := range [][]string{r.SessionIDs, r.ExcludedBranchIDs} {
 			seen := map[string]bool{}
 			for _, id := range list {

@@ -172,7 +172,11 @@ func (s *Service) Snapshot() (*Snapshot, error) {
 }
 
 func (s *Service) SaveRequirement(id, rawURL, title, notes string) (config.TAPDRequirement, error) {
-	u, err := config.NormalizeTAPDURL(rawURL)
+	title = strings.TrimSpace(title)
+	if title == "" {
+		return config.TAPDRequirement{}, fmt.Errorf("requirement title is required")
+	}
+	u, err := config.NormalizeRequirementURL(rawURL)
 	if err != nil {
 		return config.TAPDRequirement{}, err
 	}
@@ -182,6 +186,9 @@ func (s *Service) SaveRequirement(id, rawURL, title, notes string) (config.TAPDR
 	}
 	var out config.TAPDRequirement
 	err = s.Store.Mutate(func(c *config.Config) error {
+		if _, err := config.Migrate(c); err != nil {
+			return err
+		}
 		r := FindRequirement(c, id)
 		if r == nil {
 			if !create {
@@ -191,7 +198,7 @@ func (s *Service) SaveRequirement(id, rawURL, title, notes string) (config.TAPDR
 			r = &c.TAPDRequirements[len(c.TAPDRequirements)-1]
 		}
 		r.URL = u
-		r.Title = strings.TrimSpace(title)
+		r.Title = title
 		r.Notes = strings.TrimSpace(notes)
 		out = *r
 		return nil

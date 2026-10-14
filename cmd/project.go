@@ -26,7 +26,7 @@ func init() {
 		Long: `Examples:
   flow project add                       # alias = basename($PWD), path = $PWD
   flow project add cube                  # alias = cube,            path = $PWD
-  flow project add cube /dsm/oev/Cube    # alias = cube,            path = /dsm/oev/Cube
+  flow project add cube /home/user/src/Cube # alias = cube,         path = /home/user/src/Cube
   flow project add cube -                # alias = cube,            path = $PWD (explicit)
 `,
 		Args: cobra.MaximumNArgs(2),

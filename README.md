@@ -57,10 +57,10 @@ The schema lives in `internal/config/schema.go`. A minimal example:
 
 ```json
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "projects": [
-    {"alias": "oev",  "path": "/dsm/oev"},
-    {"alias": "cube", "path": "/dsm/oev/CubeSandbox", "tags": ["go","rust"]}
+    {"alias": "work", "path": "/home/user/work"},
+    {"alias": "cube", "path": "/home/user/work/CubeSandbox", "tags": ["go","rust"]}
   ],
   "scripts": [
     {"alias": "build", "cwd": "@cube", "command": "make build"}
@@ -236,12 +236,12 @@ schedules. Each row has:
 Run output is streamed into independent tabs, so several commands can stay
 visible without blocking resource management.
 
-### TAPD requirements and Codex sessions
+### Requirements and Codex sessions
 
-Open **需求与会话** in the UI, or visit `/#agent-sessions`. Add a TAPD URL and
-associate an existing session by its full ID, unique prefix (at least eight
-characters), or the searchable local session picker. Optional titles and notes
-help you find the requirement later. Flow stores links; it does not sign into TAPD.
+Open **需求与会话** in the UI, or visit `/#agent-sessions`. A requirement name is
+required; its related URL and notes are optional. Associate an existing session by
+its full ID, unique prefix (at least eight characters), or the searchable local
+session picker. Flow stores the URL as metadata and does not fetch its contents.
 
 Entering the workspace preloads the local session picker. Reopening it displays
 previous results immediately while checking for updates. Complete discovery results
@@ -265,7 +265,7 @@ Re-linking explicitly restores that branch. Ancestors imported only for context 
 shown with dashed borders. Missing local sessions keep their IDs and relationships.
 
 ```bash
-flow agent-session tapd add 'https://tapd.example/story/123' --title 'Replay updates'
+flow agent-session tapd add 'Replay updates' --url 'https://example.com/task/123'
 flow agent-session tapd list --json
 flow agent-session tapd edit <requirement-id> --notes 'Follow-up scope'
 flow agent-session list --local --json
@@ -306,7 +306,7 @@ HTTP endpoints mirror these operations:
 
 | Endpoint | Methods / purpose |
 | --- | --- |
-| `/api/tapd-requirements` | GET snapshot, POST create (`url`, `title`, `notes`) |
+| `/api/tapd-requirements` | GET snapshot, POST create (`title` required; `url`, `notes` optional) |
 | `/api/tapd-requirements/{id}` | PATCH metadata, DELETE requirement |
 | `/api/tapd-requirements/{id}/sessions` | POST link (`session_id`) |
 | `/api/tapd-requirements/{id}/sessions/{session-id}` | DELETE branch association |

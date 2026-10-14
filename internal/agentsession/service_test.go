@@ -68,6 +68,23 @@ func addReq(t *testing.T, s *Service, url string) string {
 	}
 	return r.ID
 }
+
+func TestRequirementTitleRequiredAndURLIsOptional(t *testing.T) {
+	s, _ := setup(t)
+	if _, err := s.SaveRequirement("", "https://example.com/task/1", "  ", ""); err == nil {
+		t.Fatal("blank requirement title accepted")
+	}
+	r, err := s.SaveRequirement("", "", "  无链接需求  ", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if r.Title != "无链接需求" || r.URL != "" {
+		t.Fatalf("unexpected requirement: %+v", r)
+	}
+	if _, err := s.SaveRequirement(r.ID, "javascript:alert(1)", r.Title, ""); err == nil {
+		t.Fatal("invalid optional URL accepted")
+	}
+}
 func link(t *testing.T, s *Service, r, id string) {
 	t.Helper()
 	if _, e := s.Link(context.Background(), r, id); e != nil {
